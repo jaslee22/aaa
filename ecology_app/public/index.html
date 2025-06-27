@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ecology Survey App</title>
+  <style>
+    #map { width: 100%; height: 300px; }
+  </style>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+</head>
+<body>
+  <h1>Ecology Survey App</h1>
+  <div id="map"></div>
+  <form id="survey-form" enctype="multipart/form-data">
+    <label>Description: <input type="text" id="description" required></label><br>
+    <label>Photo: <input type="file" id="photo" accept="image/*" required></label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById('map'), { zoom: 18 });
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          map.setCenter(latlng);
+          new google.maps.Marker({ position: latlng, map: map });
+          window.currentLocation = latlng;
+        }, err => console.error(err));
+      }
+    }
+    window.onload = initMap;
+
+    document.getElementById('survey-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const description = document.getElementById('description').value;
+      const photo = document.getElementById('photo').files[0];
+      if (!window.currentLocation) {
+        alert('Waiting for location');
+        return;
+      }
+      const data = new FormData();
+      data.append('description', description);
+      data.append('photo', photo);
+      data.append('lat', window.currentLocation.lat);
+      data.append('lng', window.currentLocation.lng);
+
+      fetch('/api/observations', { method: 'POST', body: data })
+        .then(r => r.json())
+        .then(() => alert('Saved!'))
+        .catch(err => { console.error(err); alert('Error'); });
+    });
+  </script>
+</body>
+</html>
