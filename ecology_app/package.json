@@ -1,0 +1,13 @@
+{
+  "name": "ecology-app",
+  "version": "1.0.0",
+  "description": "Ecology survey app with map, data upload and real time storage.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5"
+  }
+}
